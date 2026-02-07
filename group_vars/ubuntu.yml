@@ -1,0 +1,3 @@
+# Pacotes extras apenas para Ubuntu (exemplo)
+lab_packages_extra:
+  - net-tools

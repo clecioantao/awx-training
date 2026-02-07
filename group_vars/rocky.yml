@@ -1,0 +1,3 @@
+# Pacotes extras apenas para Rocky (exemplo)
+lab_packages_extra:
+  - tar

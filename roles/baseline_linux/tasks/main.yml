@@ -18,11 +18,16 @@
   ansible.builtin.command: "timedatectl set-timezone {{ lab_timezone }}"
   when: tz_current.stdout != lab_timezone
 
-- name: Install baseline packages (generic)
-  ansible.builtin.package:
-    name: "{{ lab_packages }}"
-    state: present
+# - name: Install baseline packages (generic)
+#   ansible.builtin.package:
+#     name: "{{ lab_packages }}"
+#     state: present
 
+- name: Install baseline packages (common + distro extras)
+  ansible.builtin.package:
+    name: "{{ (lab_packages | default([])) + (lab_packages_extra | default([])) }}"
+    state: present
+    
 - name: Ensure /opt/lab exists
   ansible.builtin.file:
     path: /opt/lab

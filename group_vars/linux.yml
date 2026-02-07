@@ -1,0 +1,7 @@
+lab_timezone: "America/Sao_Paulo"
+
+# Pacotes comuns para todo Linux do laboratório
+lab_packages:
+  - curl
+  - vim
+  - git

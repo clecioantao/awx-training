@@ -4,15 +4,15 @@
   become: true
   gather_facts: true
 
-  vars:
-    lab_timezone: "America/Sao_Paulo"
-    lab_packages:
-      - curl
-      - vim
-      - git
+  # vars:
+  #   lab_timezone: "America/Sao_Paulo"
+  #   lab_packages:
+  #     - curl
+  #     - vim
+  #     - git
 
-  environment:
-    ANSIBLE_ROLES_PATH: "{{ playbook_dir }}/../roles"
-    
+  # environment:
+  #   ANSIBLE_ROLES_PATH: "{{ playbook_dir }}/../roles"
+
   roles:
     - baseline_linux
