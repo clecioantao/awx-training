@@ -1,0 +1,6 @@
+- name: Ping Linux hosts (AWX Training)
+  hosts: linux
+  gather_facts: false
+  tasks:
+    - name: Ping via Ansible
+      ansible.builtin.ping:
