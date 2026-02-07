@@ -11,5 +11,8 @@
       - vim
       - git
 
+  environment:
+    ANSIBLE_ROLES_PATH: "{{ playbook_dir }}/../roles"
+    
   roles:
     - baseline_linux
