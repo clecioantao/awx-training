@@ -1,0 +1,79 @@
+  hosts: linux
+  become: true
+  gather_facts: true
+
+  vars:
+    lab_timezone: "America/Sao_Paulo"
+    lab_packages:
+      - curl
+      - vim
+      - git
+
+  tasks:
+    - name: Show basic facts (hostname, distro, version, default IPv4)
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Kernel: {{ ansible_kernel }}"
+          - "Default IPv4: {{ ansible_default_ipv4.address | default('N/A') }}"
+          - "CPU(s): {{ ansible_processor_vcpus | default('N/A') }}"
+          - "RAM MB: {{ ansible_memtotal_mb | default('N/A') }}"
+
+    - name: Set timezone
+      ansible.builtin.timezone:
+        name: "{{ lab_timezone }}"
+
+    - name: Install baseline packages (generic)
+      ansible.builtin.package:
+        name: "{{ lab_packages }}"
+        state: present
+
+    - name: Ensure /opt/lab exists
+      ansible.builtin.file:
+        path: /opt/lab
+        state: directory
+        mode: "0755"
+---
+# Playbook para coletar fatos e aplicar baseline em hosts Linux
+- name: Facts + Baseline (Linux)
+  hosts: linux  # Grupo de hosts alvo
+  become: true  # Executa tarefas como root
+  gather_facts: true  # Coleta informações do sistema automaticamente
+
+  vars:
+    lab_timezone: "America/Sao_Paulo"  # Define o timezone padrão do laboratório
+    lab_packages:  # Lista de pacotes a serem instalados
+      - curl
+      - vim
+      - git
+
+  tasks:
+    # Exibe informações básicas do sistema (hostname, SO, kernel, IP, CPU, RAM)
+    - name: Show basic facts (hostname, distro, version, default IPv4)
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Kernel: {{ ansible_kernel }}"
+          - "Default IPv4: {{ ansible_default_ipv4.address | default('N/A') }}"
+          - "CPU(s): {{ ansible_processor_vcpus | default('N/A') }}"
+          - "RAM MB: {{ ansible_memtotal_mb | default('N/A') }}"
+
+    # Configura o timezone do sistema
+    - name: Set timezone
+      ansible.builtin.timezone:
+        name: "{{ lab_timezone }}"
+
+    # Instala os pacotes definidos em lab_packages
+    - name: Install baseline packages (generic)
+      ansible.builtin.package:
+        name: "{{ lab_packages }}"
+        state: present
+
+    # Garante que o diretório /opt/lab exista com permissões 0755
+    - name: Ensure /opt/lab exists
+      ansible.builtin.file:
+        path: /opt/lab
+        state: directory
+        mode: "0755"
