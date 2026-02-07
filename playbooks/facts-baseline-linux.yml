@@ -34,7 +34,7 @@
         path: /opt/lab
         state: directory
         mode: "0755"
----
+
 # Playbook para coletar fatos e aplicar baseline em hosts Linux
 - name: Facts + Baseline (Linux)
   hosts: linux  # Grupo de hosts alvo
