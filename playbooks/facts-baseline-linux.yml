@@ -24,9 +24,18 @@
           - "RAM MB: {{ ansible_memtotal_mb | default('N/A') }}"
 
     # Configura o timezone do sistema
-    - name: Set timezone via timedatectl
-      ansible.builtin.command: "timedatectl set-timezone {{ lab_timezone }}"
+    # - name: Set timezone via timedatectl
+    #   ansible.builtin.command: "timedatectl set-timezone {{ lab_timezone }}"
+    #   changed_when: false
+
+    - name: Read current timezone
+      ansible.builtin.command: timedatectl show -p Timezone --value
+      register: tz_current
       changed_when: false
+
+    - name: Set timezone when different
+      ansible.builtin.command: "timedatectl set-timezone {{ lab_timezone }}"
+      when: tz_current.stdout != lab_timezone
 
     # Instala os pacotes definidos em lab_packages
     - name: Install baseline packages (generic)
