@@ -1,0 +1,15 @@
+---
+- name: Baseline Linux via Role
+  hosts: linux
+  become: true
+  gather_facts: true
+
+  vars:
+    lab_timezone: "America/Sao_Paulo"
+    lab_packages:
+      - curl
+      - vim
+      - git
+
+  roles:
+    - baseline_linux

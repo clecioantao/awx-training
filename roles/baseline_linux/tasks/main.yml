@@ -1,0 +1,30 @@
+---
+- name: Show basic facts (hostname, distro, version, default IPv4)
+  ansible.builtin.debug:
+    msg:
+      - "Hostname: {{ ansible_hostname }}"
+      - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      - "Kernel: {{ ansible_kernel }}"
+      - "Default IPv4: {{ ansible_default_ipv4.address | default('N/A') }}"
+      - "CPU(s): {{ ansible_processor_vcpus | default('N/A') }}"
+      - "RAM MB: {{ ansible_memtotal_mb | default('N/A') }}"
+
+- name: Read current timezone
+  ansible.builtin.command: timedatectl show -p Timezone --value
+  register: tz_current
+  changed_when: false
+
+- name: Set timezone when different
+  ansible.builtin.command: "timedatectl set-timezone {{ lab_timezone }}"
+  when: tz_current.stdout != lab_timezone
+
+- name: Install baseline packages (generic)
+  ansible.builtin.package:
+    name: "{{ lab_packages }}"
+    state: present
+
+- name: Ensure /opt/lab exists
+  ansible.builtin.file:
+    path: /opt/lab
+    state: directory
+    mode: "0755"
