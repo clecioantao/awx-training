@@ -1,0 +1,7 @@
+---
+- name: Windows 11 - win_ping
+  hosts: windows-11-lab
+  gather_facts: false
+  tasks:
+    - name: Win ping
+      ansible.windows.win_ping:

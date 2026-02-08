@@ -1,0 +1,7 @@
+---
+- name: Windows Server - win_ping
+  hosts: lab-winserver-1
+  gather_facts: false
+  tasks:
+    - name: Win ping
+      ansible.windows.win_ping:
