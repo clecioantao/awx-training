@@ -1,0 +1,11 @@
+---
+# Defaults da role (evita "undefined" no AWX)
+lab_timezone: "America/Sao_Paulo"
+
+lab_packages:
+  - curl
+  - vim
+  - git
+
+# Pode ser sobrescrito por group_vars/host_vars
+lab_packages_extra: []
