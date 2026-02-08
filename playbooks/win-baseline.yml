@@ -1,0 +1,43 @@
+---
+- name: Windows Baseline (Lab)
+  hosts: windows
+  gather_facts: false
+
+  vars:
+    # Timezone Windows para São Paulo
+    win_timezone: "E. South America Standard Time"
+    lab_dir: "C:\\Lab"
+
+  tasks:
+    - name: Show basic Windows info
+      ansible.windows.win_shell: |
+        hostname
+        systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+      register: win_info
+      changed_when: false
+
+    - name: Print Windows info
+      ansible.builtin.debug:
+        var: win_info.stdout_lines
+
+    - name: Get current timezone
+      ansible.windows.win_shell: tzutil /g
+      register: tz_current
+      changed_when: false
+
+    - name: Set timezone when different
+      ansible.windows.win_shell: 'tzutil /s "{{ win_timezone }}"'
+      when: tz_current.stdout | trim != win_timezone
+
+    - name: Ensure C:\Lab exists
+      ansible.windows.win_file:
+        path: "{{ lab_dir }}"
+        state: directory
+
+    - name: Create baseline marker file
+      ansible.windows.win_copy:
+        dest: "{{ lab_dir }}\\baseline.txt"
+        content: |
+          Baseline OK
+          Host: {{ inventory_hostname }}
+          Timezone: {{ win_timezone }}
