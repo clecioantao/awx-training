@@ -1,6 +1,6 @@
 ---
 - name: Windows Baseline (Lab)
-  hosts: windows
+  hosts: microsoft
   gather_facts: false
 
   vars:
