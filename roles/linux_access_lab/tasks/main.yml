@@ -1,0 +1,44 @@
+---
+- name: Ensure ops group exists on Debian family (sudo)
+  ansible.builtin.group:
+    name: sudo
+    state: present
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Ensure ops group exists on RedHat family (wheel)
+  ansible.builtin.group:
+    name: wheel
+    state: present
+  when: ansible_facts.os_family == 'RedHat'
+
+- name: Create ops user
+  ansible.builtin.user:
+    name: "{{ ops_user }}"
+    shell: "{{ ops_shell }}"
+    create_home: true
+    groups: "{{ 'wheel' if ansible_facts.os_family == 'RedHat' else 'sudo' }}"
+    append: true
+    state: present
+
+- name: Fail if ops_authorized_key is empty
+  ansible.builtin.assert:
+    that:
+      - ops_authorized_key | length > 20
+    fail_msg: "ops_authorized_key está vazio. Defina a chave pública no AWX (Group Variables) antes de rodar."
+    success_msg: "ops_authorized_key OK"
+
+- name: Set authorized key for ops user
+  ansible.posix.authorized_key:
+    user: "{{ ops_user }}"
+    key: "{{ ops_authorized_key }}"
+    state: present
+
+- name: Add sudoers file for ops (NOPASSWD) with validation
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/{{ ops_user }}"
+    content: |
+      {{ ops_user }} ALL=(ALL) NOPASSWD: ALL
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"

@@ -1,0 +1,8 @@
+---
+ops_user: ops
+ops_groups:
+  - wheel
+ops_shell: /bin/bash
+
+# Cole aqui a chave pública que será autorizada para o usuário ops
+ops_authorized_key: ""

@@ -1,0 +1,8 @@
+---
+- name: Linux Access Lab (ops user + ssh key + sudoers)
+  hosts: linux
+  become: true
+  gather_facts: true
+
+  roles:
+    - linux_access_lab
