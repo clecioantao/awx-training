@@ -33,15 +33,12 @@
           </body>
           </html>
 
-    - name: Open Firewall for HTTP 80
-      ansible.windows.win_firewall_rule:
-        name: "HTTP 80 (IIS)"
-        localport: 80
-        action: allow
-        direction: in
-        protocol: tcp
-        state: present
-        enabled: true
+    - name: Open Firewall for HTTP 80 (netsh - lab)
+      ansible.windows.win_shell: |
+        netsh advfirewall firewall add rule name="HTTP 80 (IIS)" dir=in action=allow protocol=TCP localport=80
+      register: fw_http
+      changed_when: "'Ok.' in fw_http.stdout or 'already exists' not in fw_http.stdout"
+      failed_when: false
 
     - name: Show if reboot is required (informational)
       ansible.builtin.debug:
