@@ -1,0 +1,48 @@
+---
+- name: Windows Server - Install and Configure IIS (Lab)
+  hosts: server
+  gather_facts: false
+
+  vars:
+    web_root: 'C:\inetpub\wwwroot'
+    index_file: '{{ web_root }}\index.html'
+
+  tasks:
+    - name: Install IIS (Web-Server)
+      ansible.windows.win_feature:
+        name: Web-Server
+        state: present
+        include_management_tools: true
+      register: iis_install
+
+    - name: Ensure IIS service (W3SVC) is running and enabled
+      ansible.windows.win_service:
+        name: W3SVC
+        start_mode: auto
+        state: started
+
+    - name: Deploy simple index.html
+      ansible.windows.win_copy:
+        dest: "{{ index_file }}"
+        content: |
+          <html>
+          <head><title>AWX Lab IIS</title></head>
+          <body>
+            <h1>IIS OK - AWX Baseline</h1>
+            <p>Host: {{ inventory_hostname }}</p>
+          </body>
+          </html>
+
+    - name: Open Firewall for HTTP 80
+      ansible.windows.win_firewall_rule:
+        name: "HTTP 80 (IIS)"
+        localport: 80
+        action: allow
+        direction: in
+        protocol: tcp
+        state: present
+        enabled: true
+
+    - name: Show if reboot is required (informational)
+      ansible.builtin.debug:
+        msg: "IIS installation requested reboot: {{ iis_install.reboot_required | default(false) }}"
