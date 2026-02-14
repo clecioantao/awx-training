@@ -11,7 +11,6 @@
     regexp: '^ClientAliveInterval\s+'
     line: "ClientAliveInterval {{ ssh_client_alive_interval }}"
     create: false
-    backrefs: false
   notify: restart sshd
 
 - name: Configure SSH keepalive (ClientAliveCountMax)
@@ -57,14 +56,27 @@
     state: present
   when: ansible_facts.os_family == 'Debian'
 
-- name: Allow SSH in ufw (Debian family)
-  community.general.ufw:
-    rule: allow
-    port: "{{ ssh_port }}"
-    proto: tcp
+- name: Allow SSH in ufw (Debian family) - command
+  ansible.builtin.command: "ufw allow {{ ssh_port }}/tcp"
+  register: ufw_allow
+  changed_when: false
+  failed_when: false
   when: ansible_facts.os_family == 'Debian'
 
-- name: Ensure ufw is enabled (Debian family)
-  community.general.ufw:
-    state: enabled
+- name: Enable ufw (Debian family) - command
+  ansible.builtin.command: "ufw --force enable"
+  register: ufw_enable
+  changed_when: false
+  failed_when: false
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Show ufw status (Debian family) - informational
+  ansible.builtin.command: "ufw status"
+  register: ufw_status
+  changed_when: false
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Print ufw status
+  ansible.builtin.debug:
+    var: ufw_status.stdout_lines
   when: ansible_facts.os_family == 'Debian'
