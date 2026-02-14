@@ -1,0 +1,7 @@
+*** LAB MANAGED BY AWX ***
+
+Host: {{ ansible_facts.hostname }}
+OS: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}
+Kernel: {{ ansible_facts.kernel }}
+
+Last run: {{ ansible_date_time.iso8601 }}
