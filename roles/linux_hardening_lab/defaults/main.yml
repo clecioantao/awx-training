@@ -1,0 +1,8 @@
+---
+motd_path: /etc/motd
+
+ssh_client_alive_interval: 300
+ssh_client_alive_count_max: 2
+
+# porta SSH no lab
+ssh_port: 22

@@ -1,0 +1,70 @@
+---
+- name: Ensure MOTD is managed
+  ansible.builtin.template:
+    src: motd.j2
+    dest: "{{ motd_path }}"
+    mode: "0644"
+
+- name: Configure SSH keepalive (ClientAliveInterval)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveInterval\s+'
+    line: "ClientAliveInterval {{ ssh_client_alive_interval }}"
+    create: false
+    backrefs: false
+  notify: restart sshd
+
+- name: Configure SSH keepalive (ClientAliveCountMax)
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveCountMax\s+'
+    line: "ClientAliveCountMax {{ ssh_client_alive_count_max }}"
+    create: false
+  notify: restart sshd
+
+- name: Ensure SSH service is running
+  ansible.builtin.service:
+    name: "{{ 'sshd' if ansible_facts.os_family == 'RedHat' else 'ssh' }}"
+    state: started
+    enabled: true
+
+# Rocky / RHEL family
+- name: Ensure firewalld is installed (RedHat family)
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+  when: ansible_facts.os_family == 'RedHat'
+
+- name: Ensure firewalld is running (RedHat family)
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: true
+  when: ansible_facts.os_family == 'RedHat'
+
+- name: Allow SSH in firewalld (RedHat family)
+  ansible.posix.firewalld:
+    service: ssh
+    permanent: true
+    state: enabled
+    immediate: true
+  when: ansible_facts.os_family == 'RedHat'
+
+# Ubuntu / Debian family
+- name: Ensure ufw is installed (Debian family)
+  ansible.builtin.package:
+    name: ufw
+    state: present
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Allow SSH in ufw (Debian family)
+  community.general.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+  when: ansible_facts.os_family == 'Debian'
+
+- name: Ensure ufw is enabled (Debian family)
+  community.general.ufw:
+    state: enabled
+  when: ansible_facts.os_family == 'Debian'

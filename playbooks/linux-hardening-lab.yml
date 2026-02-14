@@ -1,0 +1,8 @@
+---
+- name: Linux Hardening Lab (light)
+  hosts: linux
+  become: true
+  gather_facts: true
+
+  roles:
+    - linux_hardening_lab
