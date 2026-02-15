@@ -28,7 +28,33 @@
   when: ansible_facts.os_family == 'Debian'
 
 - name: Ensure web service is running and enabled
-  ansible.builtin.service:
-    name: "{{ 'httpd' if ansible_facts.os_family == 'RedHat' else 'nginx' }}"
-    state: started
-    enabled: true
+  block:
+    - name: Start and enable web service
+      ansible.builtin.service:
+        name: "{{ 'httpd' if ansible_facts.os_family == 'RedHat' else 'nginx' }}"
+        state: started
+        enabled: true
+  rescue:
+    - name: Collect httpd status (RedHat family)
+      ansible.builtin.command: systemctl status httpd --no-pager -l
+      register: httpd_status
+      changed_when: false
+      when: ansible_facts.os_family == 'RedHat'
+
+    - name: Collect httpd journal (RedHat family)
+      ansible.builtin.command: journalctl -xeu httpd --no-pager -n 80
+      register: httpd_journal
+      changed_when: false
+      when: ansible_facts.os_family == 'RedHat'
+
+    - name: Print httpd diagnostics
+      ansible.builtin.debug:
+        msg:
+          - "{{ httpd_status.stdout_lines | default([]) }}"
+          - "{{ httpd_journal.stdout_lines | default([]) }}"
+      when: ansible_facts.os_family == 'RedHat'
+
+    - name: Fail with httpd diagnostics
+      ansible.builtin.fail:
+        msg: "httpd failed to start. See diagnostics above."
+      when: ansible_facts.os_family == 'RedHat'
