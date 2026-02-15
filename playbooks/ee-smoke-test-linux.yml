@@ -1,0 +1,15 @@
+- name: EE Smoke Test (Linux)
+  hosts: ubuntu
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Check community.general.ufw module is available
+      community.general.ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+      register: ufw_result
+
+    - name: Show result
+      ansible.builtin.debug:
+        var: ufw_result

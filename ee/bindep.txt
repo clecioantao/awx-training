@@ -1,0 +1,1 @@
+# Intencionalmente vazio (lab). Evita instalar pacotes via dnf durante o build.
