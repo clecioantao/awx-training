@@ -1,0 +1,8 @@
+---
+- name: Linux Web Lab (nginx/httpd)
+  hosts: linux
+  become: true
+  gather_facts: true
+
+  roles:
+    - linux_web_lab

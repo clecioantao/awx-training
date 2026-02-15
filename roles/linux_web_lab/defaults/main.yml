@@ -1,0 +1,4 @@
+---
+web_port: 80
+web_root_redhat: /var/www/html
+web_root_debian: /var/www/html
